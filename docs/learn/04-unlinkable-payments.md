@@ -85,7 +85,7 @@ sequenceDiagram
     S->>S: verify proof, mint short-lived API key, capped in dollars
     S-->>U: key (exists only in your memory)
     U->>P: prompts go DIRECT to the provider, with that key
-    Note over P: provider sees content; never sees your funding identity
+    Note over P: provider sees content, never sees your funding identity
     P-->>U: response
     Note over S: at expiry: signed usage receipt settles the capped amount
 ```

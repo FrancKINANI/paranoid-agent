@@ -231,7 +231,7 @@ sequenceDiagram
         G-->>A: 4xx refused (fail closed) — nothing sent upstream
     else rewrite ok
         G->>G: egress guard — protected literals (D13, planned)
-        G->>G: obtain payment lease (zkapi | byok; mock only in dev)
+        G->>G: obtain payment lease (zkapi or byok, mock is dev-only)
         G->>T: CONNECT with session isolation token (remote DNS)
         T->>P: request leaves via Tor exit
         P-->>G: response (streamed or whole)

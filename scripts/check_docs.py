@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the documentation set: link resolution, code fences, and risky claims.
+"""Verify the documentation set: link resolution, code fences, Mermaid blocks, risky claims.
 
 Run from the repository root:  python3 scripts/check_docs.py
 Exit code 0 = all structural checks pass, 1 = at least one failure.
@@ -25,6 +25,12 @@ RISKY = [
     "fully private",
     "cannot be traced",
 ]
+# Mermaid fails to render a fenced block unless the first line names a diagram type.
+MERMAID_STARTS = (
+    "sequenceDiagram", "stateDiagram", "stateDiagram-v2", "flowchart", "graph",
+    "classDiagram", "erDiagram", "gantt", "pie", "timeline", "journey",
+    "quadrantChart", "mindmap", "gitGraph", "sankey-beta", "xychart-beta",
+)
 HEDGES = (
     "not", "no ", "never", "unless", "cannot", "qualified", "partial", "weaker",
     "claim", "unproven", "would", "does not", "isn't", "cannot be", "advisory",
@@ -42,6 +48,59 @@ def slugify(heading: str) -> str:
 def headings_of(path: Path) -> set[str]:
     text = path.read_text(encoding="utf-8")
     return {slugify(m.group(1)) for m in (HEADING_RE.match(l) for l in text.splitlines()) if m}
+
+
+def fenced_blocks(lines: list[str]):
+    """Yield (opening_fence_line, info_string, [(lineno, line), ...]) per block."""
+    opened: int | None = None
+    info = ""
+    body: list[tuple[int, str]] = []
+    for lineno, line in enumerate(lines, 1):
+        if line.lstrip().startswith("```"):
+            if opened is None:
+                opened, info, body = lineno, line.strip()[3:].strip(), []
+            else:
+                yield opened, info, body
+                opened = None
+            continue
+        if opened is not None:
+            body.append((lineno, line))
+    if opened is not None:  # unclosed; the fence-count check reports it
+        yield opened, info, body
+
+
+def check_mermaid(rel: Path, lines: list[str]) -> list[str]:
+    """Flag Mermaid blocks that will not render.
+
+    Both rules here come from real breakage that the fence-balance check could not
+    see: a stray opening fence produced an *empty* block with the diagram spilled
+    into prose, and a `;` inside a sequence message made Mermaid parse the rest of
+    the line as a new statement.
+    """
+    out: list[str] = []
+    for fence_line, info, body in fenced_blocks(lines):
+        if info != "mermaid":
+            continue
+        text = [line for _, line in body]
+        first = next((line.strip() for line in text if line.strip()), "")
+        if not first:
+            out.append(
+                f"{rel}:{fence_line}: empty mermaid block - a second fence line closes it "
+                f"immediately, so the diagram renders as nothing"
+            )
+            continue
+        if not first.startswith(MERMAID_STARTS):
+            out.append(
+                f"{rel}:{fence_line}: mermaid block does not open with a diagram type, "
+                f"first line is {first[:40]!r}"
+            )
+        for lineno, line in body:
+            if ";" in line:
+                out.append(
+                    f"{rel}:{lineno}: ';' inside a mermaid block - Mermaid reads it as a "
+                    f"statement separator, not as punctuation; use a comma or a dash"
+                )
+    return out
 
 
 def check_claims(rel: Path, lines: list[str]) -> list[str]:
@@ -128,7 +187,10 @@ def main() -> int:
                             f"{resolved.relative_to(ROOT)}"
                         )
 
-        # 3. Risky claims must be hedged within their paragraph.
+        # 3. Mermaid blocks must be renderable: non-empty, typed, no `;`.
+        failures.extend(check_mermaid(rel, lines))
+
+        # 4. Risky claims must be hedged within their paragraph.
         warnings.extend(check_claims(rel, lines))
 
     for doc in docs:
@@ -147,7 +209,8 @@ def main() -> int:
         return 1
 
     print(f"OK: {len(docs)} documents, all relative links and anchors resolve, "
-          f"code fences balanced, {len(warnings)} claim(s) flagged for review")
+          f"code fences balanced, mermaid blocks well formed, "
+          f"{len(warnings)} claim(s) flagged for review")
     return 0
 
 
