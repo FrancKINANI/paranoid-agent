@@ -13,6 +13,8 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done, gate passed.
 These block design decisions and are the cheapest possible way to save rework. See
 [docs/DECISIONS.md](docs/DECISIONS.md) §B.
 
+- [ ] **Understand first:** work through `docs/learn/` lessons 00–09 — these decisions cannot be made
+      well without the concepts underneath them
 - [ ] **U1** Fund a real mainnet zkAPI note in v1, or ship mock-first?
 - [ ] **U2** Which providers must work — and do they accept Tor-routed traffic?
 - [ ] **U3** What added latency per turn is acceptable?

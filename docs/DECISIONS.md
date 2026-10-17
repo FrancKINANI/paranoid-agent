@@ -253,6 +253,11 @@ no representable form.
 These block or shape work and need an owner. Referenced from [PLAN.md](PLAN.md) §6 and
 [PROBLEM.md](PROBLEM.md) §5.
 
+**U1–U6 are the owner's own decisions, and they are intentionally still open.** The concepts they rest
+on are built from scratch in [learn/](learn/00-how-to-use.md), and
+[learn/08-decision-worksheet.md](learn/08-decision-worksheet.md) lays each one out with its costs,
+its reversibility, and a template for recording the answer here as a new ADR.
+
 | # | Question | Blocks | Impact if unanswered | Owner |
 | --- | --- | --- | --- | --- |
 | **U1** | Fund a real mainnet zkAPI note in v1, or ship mock-first? | M3 scope; acceptance testing | Payment layer stays simulated; "unlinkable payment" remains unproven in practice | User |

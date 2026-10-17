@@ -18,6 +18,7 @@ Supporting documents that cut across all four steps:
 
 | Document | Purpose |
 | --- | --- |
+| [learn/](learn/00-how-to-use.md) | **First-principles lessons** — the concepts behind every design choice, built up from scratch |
 | [LAYER-OPTIONS.md](LAYER-OPTIONS.md) | Best-available option for each layer, with evidence and verdicts |
 | [THREAT-MODEL.md](THREAT-MODEL.md) | Adversaries, what is protected, what is not, residual risk ranking |
 | [DECISIONS.md](DECISIONS.md) | Decision log (ADRs) and open questions needing an owner |
@@ -25,6 +26,9 @@ Supporting documents that cut across all four steps:
 
 ## Reading order
 
+- **New to the subject, or you want to make the decisions yourself?** Start with
+  [learn/](learn/00-how-to-use.md). Ten lessons take you from "what does private even mean" to being
+  able to answer the open questions in [DECISIONS.md](DECISIONS.md) §B on your own.
 - **First time here?** [PROBLEM.md](PROBLEM.md) → [PLAN.md](PLAN.md) → [ARCHITECTURE.md](ARCHITECTURE.md).
 - **Evaluating whether to trust this?** [THREAT-MODEL.md](THREAT-MODEL.md) → [EVALUATION.md](EVALUATION.md).
 - **About to build or review a PR?** [IMPLEMENTATION.md](IMPLEMENTATION.md) → [DECISIONS.md](DECISIONS.md).
@@ -36,7 +40,8 @@ Supporting documents that cut across all four steps:
 | --- | --- |
 | Problem definition | Complete ([PROBLEM.md](PROBLEM.md)) |
 | Option research | Complete as of 2026-10-17 ([LAYER-OPTIONS.md](LAYER-OPTIONS.md)) |
-| Architecture | Draft, pending open questions U1–U10 in [DECISIONS.md](DECISIONS.md) §B |
+| Learning material | Complete ([learn/](learn/00-how-to-use.md)) — 10 lessons, no prior knowledge assumed |
+| Architecture | Draft, pending the owner's answers to U1–U6 — see [learn/08-decision-worksheet.md](learn/08-decision-worksheet.md) and [DECISIONS.md](DECISIONS.md) §B |
 | Implementation | Not started ([IMPLEMENTATION.md](IMPLEMENTATION.md) is the plan) |
 | Verification | No checks have been run — nothing is built yet |
 

@@ -320,7 +320,11 @@ Not security facts, but they decide whether the project is usable:
 
 ## 5. Unknowns (nothing in the plan should silently depend on these)
 
-These are tracked as open questions with owners in [DECISIONS.md](DECISIONS.md):
+These are tracked as open questions with owners in [DECISIONS.md](DECISIONS.md). U1–U6 are **the
+repository owner's own decisions** and are deliberately left open until they have worked through
+[learn/](learn/00-how-to-use.md): [learn/08-decision-worksheet.md](learn/08-decision-worksheet.md)
+lays out each one with its consequences. A decision made without the underlying concepts would be
+worse than a documented unknown.
 
 | # | Unknown | Why it blocks |
 | --- | --- | --- |

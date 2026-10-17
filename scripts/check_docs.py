@@ -86,7 +86,14 @@ def check_claims(rel: Path, lines: list[str]) -> list[str]:
 
 
 def main() -> int:
-    docs = sorted(ROOT.glob("*.md")) + sorted((ROOT / "docs").glob("*.md"))
+    # Every markdown file in the tree, including docs/learn/, minus hidden and
+    # vendored directories.
+    docs = sorted(
+        p
+        for p in ROOT.rglob("*.md")
+        if not any(part.startswith(".") or part in {"node_modules", "venv"}
+                   for part in p.parts)
+    )
     failures: list[str] = []
     warnings: list[str] = []
 

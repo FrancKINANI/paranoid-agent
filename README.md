@@ -88,6 +88,7 @@ deciding what to build and being honest about what it protects.
 
 | Document | Purpose |
 | --- | --- |
+| [docs/learn/](docs/learn/00-how-to-use.md) | **Start here to understand the design** — 10 first-principles lessons, no prior knowledge assumed, ending in a decision worksheet |
 | [docs/README.md](docs/README.md) | Index, reading order, and status |
 | [docs/PROBLEM.md](docs/PROBLEM.md) | **Step 1** — facts, assumptions, constraints, unknowns, measurable success criteria |
 | [docs/PLAN.md](docs/PLAN.md) | **Step 2** — three candidate architectures compared, one chosen, falsifiers |
@@ -101,10 +102,15 @@ deciding what to build and being honest about what it protects.
 
 ---
 
-## Where to start
+## Where to start**If you want to understand the subject before deciding anything:** read
+[docs/learn/](docs/learn/00-how-to-use.md). Ten lessons build the concepts from first principles —
+what "private" means, how Tor and mixnets differ, why payments leak, why PII scrubbing fails, why a
+proxy setting is not a boundary — and end at [docs/learn/08-decision-worksheet.md](docs/learn/08-decision-worksheet.md),
+where the open questions U1–U6 are laid out for you to answer. **No implementation work starts until
+those answers exist** (see `AGENTS.md`).
 
-**If you are evaluating this:** read [docs/PROBLEM.md](docs/PROBLEM.md) §2 (what is actually true as
-of 2026-10-17), then [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) §3–4 (what you would and would not
+**If you are evaluating this:** read [docs/PROBLEM.md](docs/PROBLEM.md) §2 (what is actually true as of
+2026-10-17), then [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) §3–4 (what you would and would not
 get). Those two answer "should I trust this?" faster than anything else here.
 
 **If you are going to build it:** [docs/IMPLEMENTATION.md](docs/IMPLEMENTATION.md) §5. **Milestone M0
