@@ -21,8 +21,11 @@ and this README will not pretend otherwise.
 
 **What it addresses**
 
-- **Network layer** — Tor, with a *separate circuit per conversation* so unrelated conversations are
-  not visibly the same user.
+- **Network layer** — Tor, with a *separate circuit per conversation* so the network cannot see two
+  conversations as one user. **This is only half the job.** If the request carries a stable
+  credential — your own API key — the provider links those conversations regardless of the circuit.
+  End-to-end separation needs an unattributable credential as well; that is the zkAPI tier, not
+  T0/T1.
 - **Content layer** — a local model rewrites each prompt, dropping the sensitive details the remote
   model does not need to answer.
 - **Payment layer** — zkAPI proves you can pay without revealing which deposit is yours.
@@ -40,7 +43,13 @@ and this README will not pretend otherwise.
   client discloses the note id to the operator's indexer, and the current anonymity set is tiny
   (on the order of tens of deposits, per L2BEAT's review).
 - A **compromised local machine** defeats all of it.
-- **Attachments, images, and any text outside the `user` role** are not rewritten.
+- **Attachments, images, and any text outside the `user` role** are not rewritten. In a tool-using
+  agent loop, tool results, retrieved documents, and the replayed assistant history are re-sent every
+  turn and are **not** rewritten — so the protected fraction shrinks as an agent does more tool work.
+  Today this is a chat-shaped product; [R11](docs/THREAT-MODEL.md) says so normatively.
+- **An OpenAI-compatible *wire format* is not OpenAI the provider.** zkAPI mints short-lived
+  **OpenRouter** keys; there is no evidence that OpenAI or Anthropic accept zkAPI credentials. Your
+  own key reaches them at T0/T1 — where the provider knows exactly who you are.
 
 Every one of these is tracked adversary-by-adversary in [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md),
 which is the normative document: if anything here claims more than it allows, that is a bug.
@@ -56,11 +65,16 @@ environment cannot deliver it.
 | --- | --- | --- | --- | --- | --- |
 | **T0 Baseline** | Tor | app-level | off | off | your own key |
 | **T1 Practical** | Tor, per-conversation | app-level | local model | off | your own key |
-| **T2 Paranoid** *(goal)* | Tor, per-conversation | **kernel netns** | local, **fail-closed** | bounded Poisson | zkAPI or mock |
+| **T2 Paranoid** *(goal)* | Tor, per-conversation | **kernel netns** | local, **fail-closed** | bounded Poisson | zkAPI (**required**) |
 | **T3 Maximum** *(experimental)* | mixnet request path | kernel netns | local, fail-closed | constant-rate | zkAPI |
 
 Tier 2 is weaker on macOS/Windows, where kernel-enforced isolation is unavailable — the product says
 so rather than implying parity ([docs/DECISIONS.md](docs/DECISIONS.md) D3).
+
+**Read the Payment column as the anonymity axis, and the Network column only as the network axis.**
+`mock` is a development adapter: a T2 session running on it has *no* payment unlinkability, and
+`/admin/status` reports it that way instead of presenting "Paranoid" as achieved. At T1 the provider
+holds the key, so per-conversation circuits hide you from your ISP, not from the provider.
 
 ---
 
@@ -102,7 +116,9 @@ deciding what to build and being honest about what it protects.
 
 ---
 
-## Where to start**If you want to understand the subject before deciding anything:** read
+## Where to start
+
+**If you want to understand the subject before deciding anything:** read
 [docs/learn/](docs/learn/00-how-to-use.md). Ten lessons build the concepts from first principles —
 what "private" means, how Tor and mixnets differ, why payments leak, why PII scrubbing fails, why a
 proxy setting is not a boundary — and end at [docs/learn/08-decision-worksheet.md](docs/learn/08-decision-worksheet.md),

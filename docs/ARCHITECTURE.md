@@ -144,6 +144,14 @@ normalised wording **may legitimately equal the original** (especially code and 
 prompt" means *no bypass of this processing*, not *every character changed*; and text placed in
 `system`, `developer`, `assistant`, or tool messages is **outside** this protection.
 
+**There is no substitution table.** The rewriter paraphrases and drops; it does not replace a value
+with a placeholder. That is why no restoration step exists in the response path or in tool calls —
+there is nothing to map back. The cost is symmetric and must be measured rather than argued: an
+identifier the rewriter keeps goes out verbatim, and one it drops is unavailable to the model. If
+D14's pseudonym layer is adopted, substitution, tool-call restoration, and **streaming buffering**
+become a component of their own — a placeholder split across chunks must not be emitted
+half-restored.
+
 ### 3.5 Cover traffic (`paranoid/cover.py`)
 
 Opt-in, bounded, Poisson-scheduled dummy HTTPS GETs, structurally identical to upstream's documented
@@ -198,6 +206,10 @@ The component upstream does not have, and the reason to trust the rest.
 - **Drift detection:** assert the running configuration still matches the declared tier; a session
   that silently loses its isolation token fails loudly rather than continuing unprotected.
 - **No-persistence audit:** post-run assertions that no prompt text reached disk, logs, or temp files.
+- **Egress guard (planned, D13):** the final serialized payload is compared against a session
+  blocklist of protected literals before it leaves, with a **dry-run** mode that prints the exact
+  outbound payload to the terminal and persists nothing. Today the rewriter's output is trusted, and
+  that is residual risk R16, not a guarantee.
 
 ---
 
@@ -218,7 +230,8 @@ sequenceDiagram
     alt rewrite failed
         G-->>A: 4xx refused (fail closed) — nothing sent upstream
     else rewrite ok
-        G->>G: obtain payment lease (mock | zkapi | byok)
+        G->>G: egress guard — protected literals (D13, planned)
+        G->>G: obtain payment lease (zkapi | byok; mock only in dev)
         G->>T: CONNECT with session isolation token (remote DNS)
         T->>P: request leaves via Tor exit
         P-->>G: response (streamed or whole)

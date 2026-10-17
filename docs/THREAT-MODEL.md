@@ -67,6 +67,12 @@ controls response timing.
 *Verdict:* the provider learns what you asked (minus rewritten spans) and can profile your style.
 This is the largest practical exposure and it is **not** a bug we can fix — only reduce.
 
+**The key is the identity.** The rating above assumes runtime-key mode. In BYOK mode (T0/T1) the
+row *which requests are the same user* is **Exposed**: the API key is a stable identifier, it travels
+inside the request, and a per-conversation circuit changes nothing about it. T1's protection is
+against AD1/AD2 (the network), never against AD3 (the provider). Any sentence in this repository
+that implies otherwise is a defect under §6.
+
 ### AD4 — The payment operator (zkAPI server operator, e.g. Open Anonymity)
 
 *Capability:* verifies spend proofs, mints keys, sees request arrival times and budget tiers, holds
@@ -146,7 +152,8 @@ What holds, per tier. T2 is the recommended configuration; anything stronger is 
 | Property | T0 | T1 | **T2** | T3 (experimental) |
 | --- | --- | --- | --- | --- |
 | Source IP hidden from provider | yes | yes | **yes** | yes |
-| Conversations isolated from each other | no | partial | **yes (verified)** | yes |
+| Conversations isolated from each other **on the network** | no | partial | **yes (verified)** | yes |
+| Conversations unlinkable **by the provider** | no | **no** — one key labels every request | partial — keys rotate, content still links (R1) | partial |
 | Raw prompt leaves the machine | **yes** | no | **no** | no |
 | Non-essential sensitive spans reduced | no | measured | **measured** | measured |
 | Timing/volume obfuscated | no | no | **partial (not proven)** | constant-rate (unbuilt) |
@@ -174,11 +181,13 @@ Ordered by expected harm, so effort goes where it matters. Each entry names the 
 | R8 | **Rewriter over-removal degrades answers**, silently reducing product value and tempting users to disable rewriting | Medium | Both metrics measured and published; never silently substitute the original |
 | R9 | **Cover traffic harms third parties** if misconfigured | Medium (ethical) | Own/permitted targets only; hard budget; disabled by default |
 | R10 | **Rewriter's direct connection** is outside Tor by upstream design and must be loopback | Medium | Config validation refuses non-loopback; leak suite asserts it |
-| R11 | **Text outside the `user` role is unprotected** (system prompts, tool results, attachments) | Medium | Documented; refusal on unknown content types; clients are told not to place raw prompts there |
+| R11 | **Text outside the `user` role is unprotected** (system prompts, tool results, retrieved documents, replayed assistant history) | **High** | Documented; refusal on unknown content types. This is not a corner case: in a tool-using agent loop these channels carry most of the tokens, so the product is chat-shaped until rewriting covers structured tool output |
 | R12 | **Non-Linux platforms cannot be kernel-enforced** | Medium | Tier ceiling lowered and stated, rather than papered over |
 | R13 | **Latency pushes users to disable protections** — the most likely real-world failure | Medium | Tiers, measured p95, and T1 as an honest weaker option rather than a hidden one |
 | R14 | **Tanstack of moving parts is experimental**: oniux is new, Arti/onionmasq are new, the upstream privacy branch is not a production release | Medium | Interfaces isolate each dependency; defaults avoid experimental features; failures are loud |
 | R15 | **We might overclaim.** The biggest risk to the project's purpose | Medium-High | This document is normative; SC8 requires run-time disclosure; claims must cite a test |
+| R16 | **The rewriter's output is treated as trusted.** A local model processing untrusted text (pasted pages, tool output the user forwards) can be steered into re-emitting a sensitive span verbatim — and "fail-closed" does not catch a *valid* rewrite that leaks | Medium-High | Not yet mitigated. Planned egress guard checks the final payload against a blocklist of protected literals (D13), which is testable where "the rewriter is good" is not |
+| R17 | **The user cannot see what actually left.** The no-persistence rule (§4.5) forbids logging prompts, which also removes the only audit a user could perform on their own leakage | Medium | Planned: a dry-run mode that prints the exact outbound payload to the terminal without persisting it, plus metadata-only counters (D13) |
 
 ---
 

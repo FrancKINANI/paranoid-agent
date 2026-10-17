@@ -25,6 +25,10 @@ These block design decisions and are the cheapest possible way to save rework. S
 - [ ] **U8** Which cover-traffic endpoints do we own or have permission to poll?
 - [ ] **U9** Pin upstream `clientd` at a commit now, or wait for a reviewed release?
 - [ ] **U10** License, security policy, and how to report a vulnerability.
+- [ ] **U11** Which wire formats must your agents speak — OpenAI only, Anthropic Messages, or both?
+- [ ] **U12** Is per-task local/frontier routing in scope?
+- [ ] **D13** Decide on the egress guard + dry-run + request padding (proposed 2026-10-18)
+- [ ] **D14** Decide whether deterministic minimization replaces the LLM rewriter as the floor
 
 ---
 
