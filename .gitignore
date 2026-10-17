@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Secrets and local state — never commit these
+.env
+.env.*
+!.env.example
+config.local.toml
+*.secret
+state/
+logs/
+*.log
+
+# Wallet / payment material (zkAPI notes, seeds, proofs)
+wallet/
+wallet.json
+notes/
+seeds/
+*.proof
+*.zkey
+
+# Tor runtime
+tor-data/
+torrc.local
+
+# Local research scratch
+scratch/
+.cache/
